@@ -1,3 +1,4 @@
+import time
 import curl_cffi.requests as requests
 import random
 from fake_useragent import UserAgent
@@ -6,7 +7,7 @@ class StealthSession:
     def __init__(self, proxies=None, retries=3):
         self.session = requests.Session()
         self.retries = retries
-        self.user_agent = UserAgent()
+        #self.user_agent = UserAgent()
         self.default_headers = {
             "User-Agent": UserAgent(browsers=['Chrome'], os=['Windows', 'MacOS', 'Linux']).random,
             "Referer": self._get_random_referer(),
@@ -36,15 +37,25 @@ class StealthSession:
         self.session.headers.update(additional_headers)
     
     def fetch_cookies(self, base_url):
-        response = self.session.get(base_url, proxies=self.proxies, headers=self.default_headers)
-        if response.status_code == 200:
-            self.cookies = dict(response.cookies)
-            self.session.cookies.update(self.cookies)
-    
+        try:
+            response = self.session.get(base_url, proxies=self.proxies, headers=self.default_headers)
+            if response.status_code == 200:
+                self.cookies = dict(response.cookies)
+                self.session.cookies.update(self.cookies)
+        except Exception:
+            pass
+        
     def clear_cookies(self):
         self.session.cookies.clear()
         self.cookies = None
 
+    def is_alive(self):
+    try:
+        r = self.session.get("https://www.nseindia.com/api/marketStatus", timeout=5)
+        return r.status_code == 200
+    except Exception:
+        return False
+        
     def request(self, method, url, **kwargs):
         if self.proxies:
             kwargs["proxies"] = self.proxies
@@ -55,6 +66,7 @@ class StealthSession:
                 return response
             except Exception:
                 # time.sleep(1)  # Add a small delay between retries -- let's leave this on user to decide
+                time.sleep(0.5)
                 continue
         return None
 
