@@ -50,11 +50,11 @@ class StealthSession:
         self.cookies = None
 
     def is_alive(self):
-    try:
-        r = self.session.get("https://www.nseindia.com/api/marketStatus", timeout=5)
-        return r.status_code == 200
-    except Exception:
-        return False
+        try:
+            r = self.session.get("https://www.nseindia.com/api/marketStatus", timeout=5)
+            return r.status_code == 200
+        except Exception:
+            return False
         
     def request(self, method, url, **kwargs):
         if self.proxies:
