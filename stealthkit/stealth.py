@@ -53,7 +53,7 @@ class StealthSession:
             try:
                 response = self.session.request(method, url, **kwargs)
                 return response
-            except requests.RequestException:
+            except Exception:
                 # time.sleep(1)  # Add a small delay between retries -- let's leave this on user to decide
                 continue
         return None
